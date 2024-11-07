@@ -1,7 +1,20 @@
-import { Controller, Get, Post, Put, Delete, Param, Body, HttpException, HttpStatus } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Put,
+  Delete,
+  Param,
+  Body,
+  HttpException,
+  HttpStatus,
+  HttpCode,
+} from '@nestjs/common';
 import { UserService } from './user.service';
 import { validate as isUuidValid } from 'uuid';
-import { User, CreateUserDto, UpdatePasswordDto } from './user.interface';
+import { CreateUserDto } from './dto/create-user.dto';
+import { UpdatePasswordDto } from './dto/update-password.dto';
+import { User } from './entities/user.entity';
 
 @Controller('user')
 export class UserController {
@@ -25,26 +38,37 @@ export class UserController {
   }
 
   @Post()
+  @HttpCode(201)
   createUser(@Body() createUserDto: CreateUserDto): User {
     if (!createUserDto.login || !createUserDto.password) {
-      throw new HttpException('Missing required fields', HttpStatus.BAD_REQUEST);
+      throw new HttpException(
+        'Missing required fields',
+        HttpStatus.BAD_REQUEST,
+      );
     }
     return this.userService.createUser(createUserDto);
   }
 
   @Put(':id')
-  updatePassword(@Param('id') id: string, @Body() updatePasswordDto: UpdatePasswordDto): User {
+  updatePassword(
+    @Param('id') id: string,
+    @Body() updatePasswordDto: UpdatePasswordDto,
+  ): User {
     if (!isUuidValid(id)) {
       throw new HttpException('Invalid ID format', HttpStatus.BAD_REQUEST);
     }
     const updatedUser = this.userService.updatePassword(id, updatePasswordDto);
     if (!updatedUser) {
-      throw new HttpException('User not found or old password is incorrect', HttpStatus.FORBIDDEN);
+      throw new HttpException(
+        'User not found or old password is incorrect',
+        HttpStatus.FORBIDDEN,
+      );
     }
     return updatedUser;
   }
 
   @Delete(':id')
+  @HttpCode(204)
   deleteUser(@Param('id') id: string): void {
     if (!isUuidValid(id)) {
       throw new HttpException('Invalid ID format', HttpStatus.BAD_REQUEST);

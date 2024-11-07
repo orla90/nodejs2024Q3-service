@@ -1,6 +1,8 @@
 import { Injectable } from '@nestjs/common';
 import { v4 as uuidv4 } from 'uuid';
-import { User, CreateUserDto, UpdatePasswordDto } from './user.interface';
+import { CreateUserDto } from './dto/create-user.dto';
+import { UpdatePasswordDto } from './dto/update-password.dto';
+import { User } from './entities/user.entity';
 
 @Injectable()
 export class UserService {
@@ -19,18 +21,22 @@ export class UserService {
   }
 
   getAllUsers(): User[] {
+    console.log('users', this.users);
     return this.users;
   }
 
   getUserById(id: string): User | undefined {
-    return this.users.find(user => user.id === id);
+    return this.users.find((user) => user.id === id);
   }
 
-  updatePassword(id: string, updatePasswordDto: UpdatePasswordDto): User | null {
+  updatePassword(
+    id: string,
+    updatePasswordDto: UpdatePasswordDto,
+  ): User | null {
     const user = this.getUserById(id);
     if (!user) return null;
     if (user.password !== updatePasswordDto.oldPassword) return null;
-    
+
     user.password = updatePasswordDto.newPassword;
     user.version++;
     user.updatedAt = Date.now();
@@ -38,7 +44,7 @@ export class UserService {
   }
 
   deleteUser(id: string): boolean {
-    const index = this.users.findIndex(user => user.id === id);
+    const index = this.users.findIndex((user) => user.id === id);
     if (index === -1) return false;
     this.users.splice(index, 1);
     return true;
