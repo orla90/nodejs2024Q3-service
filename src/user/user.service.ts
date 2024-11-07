@@ -8,7 +8,7 @@ import { User } from './entities/user.entity';
 export class UserService {
   private users: User[] = [];
 
-  createUser(createUser: CreateUserDto): User {
+  create(createUser: CreateUserDto): User {
     const newUser: User = {
       id: uuidv4(),
       ...createUser,
@@ -43,7 +43,7 @@ export class UserService {
     return user;
   }
 
-  deleteUser(id: string): boolean {
+  delete(id: string): boolean {
     const index = this.users.findIndex((user) => user.id === id);
     if (index === -1) return false;
     this.users.splice(index, 1);
