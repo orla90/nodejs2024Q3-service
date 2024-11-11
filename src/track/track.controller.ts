@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   Body,
   Controller,
   Delete,
@@ -14,6 +15,7 @@ import { CreateTrackDto } from './dto/create-track.dto';
 import { UpdateTrackDto } from './dto/update-track.dto';
 import { Track } from './entities/track.entity';
 import { TrackService } from './track.service';
+import { isUUID } from 'class-validator';
 
 @Controller('track')
 export class TrackController {
@@ -32,6 +34,17 @@ export class TrackController {
   @Post()
   @HttpCode(HttpStatus.CREATED)
   create(@Body() createTrackDto: CreateTrackDto): Track {
+    if (
+      (createTrackDto.albumId && !isUUID(createTrackDto.albumId)) ||
+      (createTrackDto.artistId && !isUUID(createTrackDto.artistId)) ||
+      !createTrackDto.duration ||
+      !createTrackDto.name ||
+      (createTrackDto.duration &&
+        typeof createTrackDto.duration !== 'number') ||
+      (createTrackDto.name && typeof createTrackDto.name !== 'string')
+    ) {
+      throw new BadRequestException();
+    }
     return this.trackService.create(createTrackDto);
   }
 
@@ -40,6 +53,17 @@ export class TrackController {
     @Param('id', new ParseUUIDPipe()) id: string,
     @Body() updateTrackDto: UpdateTrackDto,
   ): Track {
+    if (
+      (updateTrackDto.albumId && !isUUID(updateTrackDto.albumId)) ||
+      (updateTrackDto.artistId && !isUUID(updateTrackDto.artistId)) ||
+      !updateTrackDto.duration ||
+      !updateTrackDto.name ||
+      (updateTrackDto.duration &&
+        typeof updateTrackDto.duration !== 'number') ||
+      (updateTrackDto.name && typeof updateTrackDto.name !== 'string')
+    ) {
+      throw new BadRequestException();
+    }
     return this.trackService.update(id, updateTrackDto);
   }
 

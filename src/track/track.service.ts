@@ -32,10 +32,11 @@ export class TrackService {
 
   update(id: string, updateTrackDto: UpdateTrackDto): Track {
     const track = this.findOne(id);
-    track.name = updateTrackDto.name || track.name;
-    track.artistId = updateTrackDto.artistId || track.artistId;
-    track.albumId = updateTrackDto.albumId || track.albumId;
-    track.duration = updateTrackDto.duration || track.duration;
+    // track.name = updateTrackDto.name || track.name;
+    // track.artistId = updateTrackDto.artistId || track.artistId;
+    // track.albumId = updateTrackDto.albumId || track.albumId;
+    // track.duration = updateTrackDto.duration || track.duration;
+    Object.assign(track, updateTrackDto);
     return track;
   }
 
