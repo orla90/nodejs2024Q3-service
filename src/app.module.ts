@@ -10,6 +10,7 @@ import { TrackModule } from './track/track.module';
 import { AlbumModule } from './album/album.module';
 import { FavoritesModule } from './favorites/favorites.module';
 import { FavoritesService } from './favorites/favorites.service';
+import { AlbumService } from './album/album.service';
 
 @Module({
   imports: [
@@ -25,6 +26,7 @@ import { FavoritesService } from './favorites/favorites.service';
     DbService,
     ArtistService,
     TrackService,
+    AlbumService,
     FavoritesService,
   ],
 })

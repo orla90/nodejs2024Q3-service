@@ -3,10 +3,11 @@ import { CreateTrackDto } from './dto/create-track.dto';
 import { UpdateTrackDto } from './dto/update-track.dto';
 import { Track } from './entities/track.entity';
 import { v4 as uuidv4 } from 'uuid';
+import { DbService } from 'src/db/db.service';
 
 @Injectable()
 export class TrackService {
-  private tracks: Track[] = [];
+  constructor(private readonly dbService: DbService) {}
 
   create(createTrackDto: CreateTrackDto): Track {
     const track: Track = {
@@ -16,16 +17,16 @@ export class TrackService {
       albumId: createTrackDto.albumId || null,
       duration: createTrackDto.duration,
     };
-    this.tracks.push(track);
+    this.dbService.tracks.push(track);
     return track;
   }
 
   findAll(): Track[] {
-    return this.tracks;
+    return this.dbService.tracks;
   }
 
   findOne(id: string): Track {
-    const track = this.tracks.find((track) => track.id === id);
+    const track = this.dbService.tracks.find((track) => track.id === id);
     if (!track) {
       throw new NotFoundException(`Track with ID ${id} not found`);
     }
@@ -42,10 +43,10 @@ export class TrackService {
   }
 
   remove(id: string): void {
-    const index = this.tracks.findIndex((track) => track.id === id);
+    const index = this.dbService.tracks.findIndex((track) => track.id === id);
     if (index === -1) {
       throw new NotFoundException(`Track with ID ${id} not found`);
     }
-    this.tracks.splice(index, 1);
+    this.dbService.tracks.splice(index, 1);
   }
 }

@@ -10,18 +10,11 @@ import { Track } from 'src/track/entities/track.entity';
 import { FavoriteAlbumDto } from './dto/favorite-album.dto';
 import { FavoriteArtistDto } from './dto/favorite-artist.dto';
 import { FavoriteTrackDto } from './dto/favorite-track.dto';
+import { DbService } from 'src/db/db.service';
 
 @Injectable()
 export class FavoritesService {
-  private favorites: Favorites = {
-    artists: [],
-    albums: [],
-    tracks: [],
-  };
-
-  private artists: Artist[] = [];
-  private albums: Album[] = [];
-  private tracks: Track[] = [];
+  constructor(private readonly dbService: DbService) {}
 
   private entityExists(collection: any[], id: string): boolean {
     return collection.some((item) => item.id === id);
@@ -29,82 +22,82 @@ export class FavoritesService {
 
   addTrackToFavorites(trackDto: FavoriteTrackDto): void {
     const { trackId } = trackDto;
-    if (!this.entityExists(this.tracks, trackId)) {
+    if (!this.entityExists(this.dbService.tracks, trackId)) {
       throw new NotFoundException('Track not found');
     }
 
-    if (this.favorites.tracks.includes(trackId)) {
+    if (this.dbService.favorites.tracks.includes(trackId)) {
       throw new BadRequestException('Track already in favorites');
     }
 
-    this.favorites.tracks.push(trackId);
+    this.dbService.favorites.tracks.push(trackId);
   }
 
   removeTrackFromFavorites(trackDto: FavoriteTrackDto): void {
     const { trackId } = trackDto;
-    const index = this.favorites.tracks.indexOf(trackId);
+    const index = this.dbService.favorites.tracks.indexOf(trackId);
     if (index === -1) {
       throw new NotFoundException('Track not in favorites');
     }
 
-    this.favorites.tracks.splice(index, 1);
+    this.dbService.favorites.tracks.splice(index, 1);
   }
 
   addAlbumToFavorites(albumDto: FavoriteAlbumDto): void {
     const { albumId } = albumDto;
-    if (!this.entityExists(this.albums, albumId)) {
+    if (!this.entityExists(this.dbService.albums, albumId)) {
       throw new NotFoundException('Album not found');
     }
 
-    if (this.favorites.albums.includes(albumId)) {
+    if (this.dbService.favorites.albums.includes(albumId)) {
       throw new BadRequestException('Album already in favorites');
     }
 
-    this.favorites.albums.push(albumId);
+    this.dbService.favorites.albums.push(albumId);
   }
 
   removeAlbumFromFavorites(albumDto: FavoriteAlbumDto): void {
     const { albumId } = albumDto;
-    const index = this.favorites.albums.indexOf(albumId);
+    const index = this.dbService.favorites.albums.indexOf(albumId);
     if (index === -1) {
       throw new NotFoundException('Album not in favorites');
     }
 
-    this.favorites.albums.splice(index, 1);
+    this.dbService.favorites.albums.splice(index, 1);
   }
 
   addArtistToFavorites(artistDto: FavoriteArtistDto): void {
     const { artistId } = artistDto;
-    if (!this.entityExists(this.artists, artistId)) {
+    if (!this.entityExists(this.dbService.artists, artistId)) {
       throw new NotFoundException('Artist not found');
     }
 
-    if (this.favorites.artists.includes(artistId)) {
+    if (this.dbService.favorites.artists.includes(artistId)) {
       throw new BadRequestException('Artist already in favorites');
     }
 
-    this.favorites.artists.push(artistId);
+    this.dbService.favorites.artists.push(artistId);
   }
 
   removeArtistFromFavorites(artistDto: FavoriteArtistDto): void {
     const { artistId } = artistDto;
-    const index = this.favorites.artists.indexOf(artistId);
+    const index = this.dbService.favorites.artists.indexOf(artistId);
     if (index === -1) {
       throw new NotFoundException('Artist not in favorites');
     }
 
-    this.favorites.artists.splice(index, 1);
+    this.dbService.favorites.artists.splice(index, 1);
   }
 
   getAllFavorites(): FavoritesResponse {
-    const favoriteArtists = this.artists.filter((artist) =>
-      this.favorites.artists.includes(artist.id),
+    const favoriteArtists = this.dbService.artists.filter((artist) =>
+      this.dbService.favorites.artists.includes(artist.id),
     );
-    const favoriteAlbums = this.albums.filter((album) =>
-      this.favorites.albums.includes(album.id),
+    const favoriteAlbums = this.dbService.albums.filter((album) =>
+      this.dbService.favorites.albums.includes(album.id),
     );
-    const favoriteTracks = this.tracks.filter((track) =>
-      this.favorites.tracks.includes(track.id),
+    const favoriteTracks = this.dbService.tracks.filter((track) =>
+      this.dbService.favorites.tracks.includes(track.id),
     );
 
     return {
