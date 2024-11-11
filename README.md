@@ -1,4 +1,5 @@
 # Home Library Service
+Users can create, read, update, delete data about Artists, Tracks and Albums, add them to Favorites in their own Home Library!
 
 ## Prerequisites
 
@@ -9,6 +10,8 @@
 
 ```
 git clone {repository URL}
+cd nodejs2024Q3-service
+git checkout develop
 ```
 
 ## Installing NPM modules
