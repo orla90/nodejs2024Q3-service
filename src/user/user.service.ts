@@ -28,7 +28,6 @@ export class UserService {
   }
 
   findAll(): User[] {
-    console.log('users', this.dbService.users);
     return this.dbService.users;
   }
 

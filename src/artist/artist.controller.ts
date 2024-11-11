@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   Body,
   Controller,
   Delete,
@@ -31,6 +32,14 @@ export class ArtistController {
 
   @Post()
   create(@Body() createArtistDto: CreateArtistDto): Artist {
+    if (
+      !createArtistDto.grammy ||
+      !createArtistDto.name ||
+      (createArtistDto.grammy && typeof createArtistDto.grammy !== 'boolean') ||
+      (createArtistDto.name && typeof createArtistDto.name !== 'string')
+    ) {
+      throw new BadRequestException();
+    }
     return this.artistService.create(createArtistDto);
   }
 
@@ -39,6 +48,14 @@ export class ArtistController {
     @Param('id', new ParseUUIDPipe()) id: string,
     @Body() updateArtistDto: UpdateArtistDto,
   ): Artist {
+    if (
+      !updateArtistDto.name ||
+      ((updateArtistDto.grammy || !updateArtistDto.grammy) &&
+        typeof updateArtistDto.grammy !== 'boolean') ||
+      (updateArtistDto.name && typeof updateArtistDto.name !== 'string')
+    ) {
+      throw new BadRequestException();
+    }
     return this.artistService.update(id, updateArtistDto);
   }
 

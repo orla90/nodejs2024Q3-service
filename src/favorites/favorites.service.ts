@@ -3,16 +3,30 @@ import {
   NotFoundException,
   UnprocessableEntityException,
 } from '@nestjs/common';
-import { FavoritesResponse } from './entities/favorites.entity';
 import { DbService } from 'src/db/db.service';
 
 @Injectable()
 export class FavoritesService {
   constructor(private readonly dbService: DbService) {}
 
+  getAllFavorites() {
+    return {
+      artists: this.dbService.artists.filter((artist) =>
+        this.dbService.favorites.artists.has(artist.id),
+      ),
+      albums: this.dbService.albums.filter((album) =>
+        this.dbService.favorites.albums.has(album.id),
+      ),
+      tracks: this.dbService.tracks.filter((track) =>
+        this.dbService.favorites.tracks.has(track.id),
+      ),
+    };
+  }
+
   addTrackToFavorites(id: string): void {
-    const track = this.dbService.tracks.find((track) => track.id === id);
-    if (!track) throw new UnprocessableEntityException();
+    if (!this.dbService.tracks.find((track) => track.id === id)) {
+      throw new UnprocessableEntityException();
+    }
 
     this.dbService.favorites.tracks.add(id);
   }
@@ -54,19 +68,5 @@ export class FavoritesService {
     }
 
     this.dbService.favorites.artists.delete(id);
-  }
-
-  getAllFavorites(): FavoritesResponse {
-    return {
-      artists: this.dbService.artists.filter((artist) =>
-        this.dbService.favorites.artists.has(artist.id),
-      ),
-      albums: this.dbService.albums.filter((album) =>
-        this.dbService.favorites.albums.has(album.id),
-      ),
-      tracks: this.dbService.tracks.filter((track) =>
-        this.dbService.favorites.tracks.has(track.id),
-      ),
-    };
   }
 }

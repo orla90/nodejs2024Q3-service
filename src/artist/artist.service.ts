@@ -46,17 +46,17 @@ export class ArtistService {
     if (index === -1) {
       throw new NotFoundException(`Artist with ID ${id} not found`);
     }
-    this.dbService.artists.splice(index, 1);
     this.removeReferences(id);
+    this.dbService.artists.splice(index, 1);
   }
 
   private removeReferences(id: string) {
-    this.dbService.tracks = this.dbService.tracks.map((track) =>
-      track.artistId === id ? { ...track, artistId: null } : track,
-    );
-
     this.dbService.albums = this.dbService.albums.map((album) =>
       album.artistId === id ? { ...album, artistId: null } : album,
+    );
+
+    this.dbService.tracks = this.dbService.tracks.map((track) =>
+      track.artistId === id ? { ...track, artistId: null } : track,
     );
 
     if (this.dbService.favorites.artists.has(id)) {

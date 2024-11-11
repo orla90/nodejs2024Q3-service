@@ -1,6 +1,5 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { Album } from './entities/album.entity';
-import { v4 as uuidv4 } from 'uuid';
 import { DbService } from 'src/db/db.service';
 import { CreateAlbumDto } from './dto/create-album.dto';
 
@@ -21,24 +20,14 @@ export class AlbumService {
   }
 
   create(createAlbumDto: CreateAlbumDto): Album {
-    const newAlbum: Album = {
-      id: uuidv4(),
-      ...createAlbumDto,
-    };
+    const newAlbum = new Album(createAlbumDto);
     this.dbService.albums.push(newAlbum);
     return newAlbum;
   }
 
-  update(id: string, name: string, year: number, artistId: string): Album {
-    const albumIndex = this.dbService.albums.findIndex(
-      (album) => album.id === id,
-    );
-    if (albumIndex === -1) {
-      throw new NotFoundException('Album not found');
-    }
-
-    const updatedAlbum = { id, name, year, artistId };
-    this.dbService.albums[albumIndex] = updatedAlbum;
+  update(id: string, updateAlbumDto: CreateAlbumDto): Album {
+    const updatedAlbum = this.findOne(id);
+    Object.assign(updatedAlbum, updateAlbumDto);
     return updatedAlbum;
   }
 
@@ -49,8 +38,8 @@ export class AlbumService {
     if (albumIndex === -1) {
       throw new NotFoundException('Album not found');
     }
-    this.removeReferences(id);
     this.dbService.albums.splice(albumIndex, 1);
+    this.removeReferences(id);
   }
 
   removeReferences(id: string) {
