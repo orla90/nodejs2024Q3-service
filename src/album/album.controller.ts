@@ -3,7 +3,10 @@ import {
   Controller,
   Delete,
   Get,
+  HttpCode,
+  HttpStatus,
   Param,
+  ParseUUIDPipe,
   Post,
   Put,
 } from '@nestjs/common';
@@ -17,32 +20,32 @@ export class AlbumController {
   constructor(private readonly albumService: AlbumService) {}
 
   @Get()
-  getAllAlbums(): Album[] {
-    return this.albumService.getAllAlbums();
+  findAll(): Album[] {
+    return this.albumService.findAll();
   }
 
   @Get(':id')
-  getAlbumById(@Param('id') id: string): Album {
-    return this.albumService.getAlbumById(id);
+  findOne(@Param('id', new ParseUUIDPipe()) id: string): Album {
+    return this.albumService.findOne(id);
   }
 
   @Post()
-  createAlbum(@Body() createAlbumDto: CreateAlbumDto): Album {
-    const { name, year, artistId } = createAlbumDto;
-    return this.albumService.createAlbum(name, year, artistId);
+  create(@Body() createAlbumDto: CreateAlbumDto): Album {
+    return this.albumService.create(createAlbumDto);
   }
 
   @Put(':id')
-  updateAlbum(
-    @Param('id') id: string,
+  update(
+    @Param('id', new ParseUUIDPipe()) id: string,
     @Body() updateAlbumDto: UpdateAlbumDto,
   ): Album {
     const { name, year, artistId } = updateAlbumDto;
-    return this.albumService.updateAlbum(id, name, year, artistId);
+    return this.albumService.update(id, name, year, artistId);
   }
 
   @Delete(':id')
-  deleteAlbum(@Param('id') id: string): void {
-    this.albumService.deleteAlbum(id);
+  @HttpCode(HttpStatus.NO_CONTENT)
+  delete(@Param('id', new ParseUUIDPipe()) id: string): void {
+    return this.albumService.delete(id);
   }
 }

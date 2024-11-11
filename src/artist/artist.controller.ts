@@ -3,7 +3,10 @@ import {
   Controller,
   Delete,
   Get,
+  HttpCode,
+  HttpStatus,
   Param,
+  ParseUUIDPipe,
   Post,
   Put,
 } from '@nestjs/common';
@@ -22,7 +25,7 @@ export class ArtistController {
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string): Artist {
+  findOne(@Param('id', new ParseUUIDPipe()) id: string): Artist {
     return this.artistService.findOne(id);
   }
 
@@ -33,14 +36,15 @@ export class ArtistController {
 
   @Put(':id')
   update(
-    @Param('id') id: string,
+    @Param('id', new ParseUUIDPipe()) id: string,
     @Body() updateArtistDto: UpdateArtistDto,
   ): Artist {
     return this.artistService.update(id, updateArtistDto);
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string): void {
+  @HttpCode(HttpStatus.NO_CONTENT)
+  remove(@Param('id', new ParseUUIDPipe()) id: string): void {
     this.artistService.remove(id);
   }
 }

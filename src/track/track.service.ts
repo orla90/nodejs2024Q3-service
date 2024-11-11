@@ -12,10 +12,7 @@ export class TrackService {
   create(createTrackDto: CreateTrackDto): Track {
     const track: Track = {
       id: uuidv4(),
-      name: createTrackDto.name,
-      artistId: createTrackDto.artistId || null,
-      albumId: createTrackDto.albumId || null,
-      duration: createTrackDto.duration,
+      ...createTrackDto,
     };
     this.dbService.tracks.push(track);
     return track;

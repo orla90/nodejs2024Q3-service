@@ -11,8 +11,8 @@ export class DbService {
   artists: Artist[] = [];
   albums: Album[] = [];
   favorites = {
-    artists: [],
-    albums: [],
-    tracks: [],
+    artists: new Set(),
+    albums: new Set(),
+    tracks: new Set(),
   };
 }

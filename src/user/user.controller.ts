@@ -9,6 +9,7 @@ import {
   HttpException,
   HttpStatus,
   HttpCode,
+  ParseUUIDPipe,
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import { validate as isUuidValid } from 'uuid';
@@ -21,16 +22,18 @@ export class UserController {
   constructor(private readonly userService: UserService) {}
 
   @Get()
-  getAllUsers(): User[] {
-    return this.userService.getAllUsers();
+  findAll(): User[] {
+    return this.userService.findAll();
   }
 
   @Get(':id')
-  getUserById(@Param('id') id: string): User {
+  findOne(
+    @Param('id', new ParseUUIDPipe()) id: string,
+  ): Omit<User, 'password'> {
     if (!isUuidValid(id)) {
       throw new HttpException('Invalid ID format', HttpStatus.BAD_REQUEST);
     }
-    const user = this.userService.getUserById(id);
+    const user = this.userService.findOne(id);
     if (!user) {
       throw new HttpException('User not found', HttpStatus.NOT_FOUND);
     }
@@ -38,8 +41,7 @@ export class UserController {
   }
 
   @Post()
-  @HttpCode(201)
-  create(@Body() createUserDto: CreateUserDto): User {
+  create(@Body() createUserDto: CreateUserDto): Omit<User, 'password'> {
     if (!createUserDto.login || !createUserDto.password) {
       throw new HttpException(
         'Missing required fields',
@@ -50,29 +52,22 @@ export class UserController {
   }
 
   @Put(':id')
-  updatePassword(
-    @Param('id') id: string,
+  update(
+    @Param('id', new ParseUUIDPipe()) id: string,
     @Body() updatePasswordDto: UpdatePasswordDto,
-  ): User {
-    if (!isUuidValid(id)) {
-      throw new HttpException('Invalid ID format', HttpStatus.BAD_REQUEST);
-    }
-    const updatedUser = this.userService.updatePassword(id, updatePasswordDto);
-    if (!updatedUser) {
+  ): Omit<User, 'password'> {
+    if (!updatePasswordDto.oldPassword || !updatePasswordDto.newPassword) {
       throw new HttpException(
-        'User not found or old password is incorrect',
-        HttpStatus.FORBIDDEN,
+        'Missing required fields',
+        HttpStatus.BAD_REQUEST,
       );
     }
-    return updatedUser;
+    return this.userService.update(id, updatePasswordDto);
   }
 
   @Delete(':id')
-  @HttpCode(204)
-  delete(@Param('id') id: string): void {
-    if (!isUuidValid(id)) {
-      throw new HttpException('Invalid ID format', HttpStatus.BAD_REQUEST);
-    }
+  @HttpCode(HttpStatus.NO_CONTENT)
+  delete(@Param('id', new ParseUUIDPipe()) id: string): void {
     const success = this.userService.delete(id);
     if (!success) {
       throw new HttpException('User not found', HttpStatus.NOT_FOUND);
